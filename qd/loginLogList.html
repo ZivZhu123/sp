@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+    <style type="text/css">
+        #app{
+            width: 80%;
+            margin: auto;
+        }
+        .el-table td{
+            padding: 0;
+        }
+        .el-pagination{
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-table :data="list.slice((currpage - 1) * pagesize, currpage * pagesize)" border style="width: 100%" @selection-change="handleSelectionChange">
+
+        <el-table-column type="index" label="序号">
+        </el-table-column>
+
+        <el-table-column prop="userName" label="商品名称">
+        </el-table-column>
+        <el-table-column prop="loginTime" label="登录时间">
+        </el-table-column>
+        <el-table-column prop="loginMessage" label="登录信息">
+        </el-table-column>
+
+        <el-table-column prop="successed" label="登录是否成功">
+        </el-table-column>
+    </el-table>
+    <el-pagination background
+                   layout="prev, pager, next, sizes, total, jumper"
+                   :page-sizes="[5, 10, 15, 20]"
+    //每页展示条选择组件
+    :page-size="pagesize"//每页展示条
+    :total="list.length"
+    @current-change="handleCurrentChange"  // currentPage改变时会触发
+    @size-change="handleSizeChange" //pagesize改变时触发
+    >
+    </el-pagination>
+</div>
+
+<script type="text/javascript">
+    Vue.use(ELEMENT)
+    axios.defaults.baseURL = 'https://www.easy-mock.com/mock/5ae417e4985d63275b55e177/luckLin'
+    axios.defaults.timeout = 1000
+    new Vue({
+        el: '#app',
+        data: {
+            msg: 8888,
+            list: [],
+            pagesize: 10,
+            currpage: 1
+        },
+        methods: {
+            getlist() {
+                let starttime = new Date();
+                axios.get('http://localhost:9999/log/loginLog/',{
+                    params: {
+                        pagesize: this.pagesize,
+                        currpage: this.currpage
+                    }
+                }).then(data => {
+                    console.log(new Date() - starttime);
+                    console.log(data.data.data.records);
+                    this.list = data.data.data.records;
+                    this.currpage = data.data.curr;
+                    this.pagesize = data.data.size;
+            }).catch(err => {
+                    console.error(err)
+                    this.$alert('请求超时，刷新重试！')
+                })
+            },
+            handleCurrentChange(cpage) {
+                this.currpage = cpage;
+            },
+            handleSizeChange(psize) {
+                this.pagesize = psize;
+            },
+            handleSelectionChange(val) {
+                console.log(val)
+            }
+        },
+        mounted() {
+            this.getlist();
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zz.ht.sys.mapper.RoleMapper">
+
+    <select id="findUserRole" resultType="com.zz.ht.sys.entity.Role">
+        SELECT
+            r.*
+        FROM
+            sys_role r
+        LEFT JOIN sys_user_role ur ON (r.role_id = ur.role_id)
+        LEFT JOIN sys_user u ON (u.user_id = ur.user_id)
+        WHERE
+            u.username = #{username}
+    </select>
+</mapper>
